@@ -4,6 +4,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 
 def create_amortization_table_corrected(house_value, annual_interest_rate, loan_term_years, down_payment, start_date, total_payment):
     initial_balance = house_value - down_payment
@@ -54,7 +55,7 @@ def create_amortization_table_corrected(house_value, annual_interest_rate, loan_
     return amortization_df_corrected
 
 # use
-house_value = 250000
+house_value = 225000
 annual_interest_rate = 7.75
 loan_term_years = 15
 down_payment = 130000
@@ -63,7 +64,7 @@ total_payment = 4000
 
 amortization_df = create_amortization_table_corrected(house_value, annual_interest_rate, loan_term_years, down_payment, start_date, total_payment)
 
-print(amortization_df['Payment'][0])
+print(f'monthly payment: {amortization_df["Principal"][0] + amortization_df["Interest"][0]}')
 amortization_df.head()
 amortization_df.to_csv('./../data/amortization.csv', index=False)
 
@@ -75,7 +76,7 @@ loan_data['Date'] = pd.to_datetime(loan_data['Date'])
 loan_data['Months Since Start'] = (loan_data['Date'].dt.year - loan_data['Date'].dt.year.min()) * 12 + loan_data['Date'].dt.month - loan_data['Date'].dt.month.min()
 loan_data['Cumulative Principal'] = loan_data['Principal'].cumsum() + loan_data['Extra Payment'].cumsum()
 loan_data['Cumulative Interest'] = loan_data['Interest'].cumsum()
-total_paid = loan_data['Payment'].sum() + loan_data['Extra Payment'].sum()
+total_paid = loan_data['Total Paid'].iloc[-1] + down_payment
 total_interest_paid = loan_data['Cumulative Interest'].iloc[-1]
 total_principal_paid = loan_data['Cumulative Principal'].iloc[-1]
 total_months_to_pay_off = loan_data['Month'].max()
@@ -110,11 +111,12 @@ ax.set_xticklabels(loan_data['Months Since Start'], rotation=45)
 ax.legend()
 
 # Adding text annotation
-text_str = f"Total Amount Paid: ${total_paid:,.2f}\nTotal Paid to Interest: ${total_interest_paid:,.2f}\nTotal Paid to Principal: ${total_principal_paid:,.2f}\nTotal Months to Pay Off: {total_months_to_pay_off}"
-ax.text(0.5, 0.98, text_str, transform=ax.transAxes, fontsize=12, verticalalignment='top', horizontalalignment='center')
+text_str = f"You paid ${total_paid:,.2f}\nTotal Paid to Interest: ${total_interest_paid:,.2f}\nTotal Paid to Principal: ${total_principal_paid:,.2f}\nTotal Months to Pay Off: {total_months_to_pay_off}"
+ax.text(0.5, 0.98, text_str, transform=ax.transAxes, fontsize=13, verticalalignment='top', horizontalalignment='center')
 
+plt.xlim(left=0, right=loan_data['Months Since Start'].iloc[-1])
+plt.ylim(bottom=0)
 plt.tight_layout()
 plt.show()
-
 
 # %%
