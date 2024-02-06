@@ -3,10 +3,8 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import pandas as pd
-import matplotlib.pyplot as plt
-import numpy as np
 
-def create_amortization_table_corrected(house_value, annual_interest_rate, loan_term_years, down_payment, start_date, total_payment):
+def create_amortization_table(house_value, annual_interest_rate, loan_term_years, down_payment, start_date, total_payment):
     initial_balance = house_value - down_payment
     monthly_interest_rate = (annual_interest_rate / 100) / 12
     total_payments = loan_term_years * 12
@@ -62,61 +60,10 @@ down_payment = 130000
 start_date = "2024-01-01" 
 total_payment = 4000
 
-amortization_df = create_amortization_table_corrected(house_value, annual_interest_rate, loan_term_years, down_payment, start_date, total_payment)
+amortization_df = create_amortization_table(house_value, annual_interest_rate, loan_term_years, down_payment, start_date, total_payment)
 
-print(f'monthly payment: {amortization_df["Principal"][0] + amortization_df["Interest"][0]}')
+print(f'required monthly payment: {amortization_df["Principal"][0] + amortization_df["Interest"][0]}')
 amortization_df.head()
 amortization_df.to_csv('./../data/amortization.csv', index=False)
+# create_loan_amortization_chart(amortization_df, down_payment=down_payment)
 
-# %%
-loan_data = amortization_df
-
-# Preprocessing and calculations
-loan_data['Date'] = pd.to_datetime(loan_data['Date'])
-loan_data['Months Since Start'] = (loan_data['Date'].dt.year - loan_data['Date'].dt.year.min()) * 12 + loan_data['Date'].dt.month - loan_data['Date'].dt.month.min()
-loan_data['Cumulative Principal'] = loan_data['Principal'].cumsum() + loan_data['Extra Payment'].cumsum()
-loan_data['Cumulative Interest'] = loan_data['Interest'].cumsum()
-total_paid = loan_data['Total Paid'].iloc[-1] + down_payment
-total_interest_paid = loan_data['Cumulative Interest'].iloc[-1]
-total_principal_paid = loan_data['Cumulative Principal'].iloc[-1]
-total_months_to_pay_off = loan_data['Month'].max()
-
-# Creating the chart
-fig, ax = plt.subplots(figsize=(12, 8))
-
-# Plot Remaining Balance
-ax.plot(loan_data['Months Since Start'], loan_data['Remaining Balance'], color='black', label='Remaining Balance')
-
-# Plot Cumulative Principal with shading
-ax.fill_between(loan_data['Months Since Start'], 0, loan_data['Cumulative Principal'], color='green', alpha=0.3, label='Cumulative Principal')
-ax.plot(loan_data['Months Since Start'], loan_data['Cumulative Principal'], color='green')
-
-# Plot Cumulative Interest with shading
-ax.fill_between(loan_data['Months Since Start'], 0, loan_data['Cumulative Interest'], color='red', alpha=0.3, label='Cumulative Interest')
-ax.plot(loan_data['Months Since Start'], loan_data['Cumulative Interest'], color='red')
-
-# Set labels and title
-ax.set_xlabel('Months Since Start')
-ax.set_ylabel('Amount ($)')
-plt.title('Loan Amortization Schedule', size=20)
-
-# Remove gridlines
-ax.grid(False)
-
-# Adjust x-ticks to show every month
-ax.set_xticks(loan_data['Months Since Start'])
-ax.set_xticklabels(loan_data['Months Since Start'], rotation=45)
-
-# Adding a legend
-ax.legend()
-
-# Adding text annotation
-text_str = f"You paid ${total_paid:,.2f}\nTotal Paid to Interest: ${total_interest_paid:,.2f}\nTotal Paid to Principal: ${total_principal_paid:,.2f}\nTotal Months to Pay Off: {total_months_to_pay_off}"
-ax.text(0.5, 0.98, text_str, transform=ax.transAxes, fontsize=13, verticalalignment='top', horizontalalignment='center')
-
-plt.xlim(left=0, right=loan_data['Months Since Start'].iloc[-1])
-plt.ylim(bottom=0)
-plt.tight_layout()
-plt.show()
-
-# %%

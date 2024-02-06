@@ -78,6 +78,9 @@ total_paid = loan_data['Payment'].sum() + loan_data['Extra Payment'].sum()
 total_interest_paid = loan_data['Cumulative Interest'].iloc[-1]
 total_principal_paid = loan_data['Cumulative Principal'].iloc[-1]
 total_months_to_pay_off = loan_data['Month'].max()
+# Determine the maximum value for the y-axis limit based on the cumulative principal
+max_y_value = loan_data['Cumulative Principal'].max()
+
 
 # Creating the chart
 fig, ax = plt.subplots(figsize=(12, 8))
