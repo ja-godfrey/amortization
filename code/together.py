@@ -92,7 +92,26 @@ def create_loan_amortization_chart(loan_data, down_payment=0):
     plt.tight_layout()
 
     # Add text annotation
-    text_str = f"${loan+down_payment:,.0f} total = ${down_payment:,} down + ${loan:,.0f} loan\n\${loan_data['Extra Payment'][0] + loan_data['Principal'][0] + loan_data['Interest'][0]:,.0f} monthly =  ${loan_data['Principal'][0] + loan_data['Interest'][0]:,.0f} required + \${loan_data['Extra Payment'][0]:,.0f} extra\nYou paid ${loan_data['Total Paid'].iloc[-1]:,.0f} after loan+interest\nTotal interest paid: ${loan_data['Interest'].sum():,.0f}\nMonths to pay off:{loan_data['Month'].iloc[-1]}"
+    total_amount = f"${loan + down_payment:,.0f}"
+    down_payment_str = f"${down_payment:,.0f}"
+    loan_amount_str = f"${loan:,.0f}"
+
+    monthly_total = f"${loan_data['Extra Payment'][0] + loan_data['Principal'][0] + loan_data['Interest'][0]:,.0f}"
+    monthly_required = f"${loan_data['Principal'][0] + loan_data['Interest'][0]:,.0f}"
+    monthly_extra = f"${loan_data['Extra Payment'][0]:,.0f}"
+
+    total_paid = f"${loan_data['Total Paid'].iloc[-1]:,.0f}"
+    total_interest = f"${loan_data['Interest'].sum():,.0f}"
+    months_to_payoff = loan_data['Month'].iloc[-1]
+
+    text_str = (
+        f"{total_amount} total = {down_payment_str} down + {loan_amount_str} loan\n"
+        f"{monthly_total} monthly = {monthly_required} required + {monthly_extra} extra\n"
+        f"You paid {total_paid} after loan+interest\n"
+        f"Total interest paid: {total_interest}\n"
+        f"Months to pay off: {months_to_payoff}"
+    )
+
     ax.text(0.35, 0.98, text_str, transform=ax.transAxes, fontsize=13, verticalalignment='top', horizontalalignment='left')
 
     plt.tight_layout()
@@ -101,12 +120,12 @@ def create_loan_amortization_chart(loan_data, down_payment=0):
     plt.close()
 
 annual_interest_rate = 5.5
-loan_term_years = 30
-down_payment = 130000
-start_date = "2024-01-01" 
+loan_term_years = 15
+down_payment = 150000
+start_date = "2024-08-01" 
 
-t_payments = [3000, 4000]
-h_values = [300000, 350000, 400000]
+t_payments = [5000]
+h_values = [300000]
 
 for h_value in h_values:
     for t_payment in t_payments:
