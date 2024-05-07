@@ -119,13 +119,13 @@ def create_loan_amortization_chart(loan_data, down_payment=0):
     plt.show()
     plt.close()
 
-annual_interest_rate = 5.5
+annual_interest_rate = 5.25
 loan_term_years = 15
-down_payment = 150000
+down_payment = 130000
 start_date = "2024-08-01" 
 
-t_payments = [5000]
-h_values = [300000]
+t_payments = [4000]
+h_values = [350000]
 
 for h_value in h_values:
     for t_payment in t_payments:
